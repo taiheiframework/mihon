@@ -76,7 +76,7 @@ object release extends Module {
   // into no baseline, or into an older one.
   private def released(root: os.Path, v: String): Unit = {
     val r = os
-      .proc("python3", "-I", root / "scripts" / "release.py", "released", "--central", "https://repo1.maven.org/maven2", "--url", repoUrl, "--artifact", "taihei-mihon_3", v)
+      .proc("python3", "-I", "-B", root / "scripts" / "release.py", "released", "--central", "https://repo1.maven.org/maven2", "--url", repoUrl, "--artifact", "taihei-mihon_3", v)
       .call(check = false, stderr = os.Pipe)
     if (r.exitCode != 0) sys.error(s"no MiMa baseline: ${r.err.text().trim()}")
   }
@@ -198,8 +198,17 @@ trait TaiheiScalafix extends ScalafixModule {
   }
 }
 
-// The repositories a module resolves from, in order, as repo-guard reads them.
-trait TaiheiResolverOrder extends CoursierModule {
+// The repositories of every module that resolves dependencies, published or not, its tests
+// included: Coursier's defaults (the local Ivy repository, then Maven Central), then the family's
+// repository for dev.taihei alone, and nothing else. Mill's own `repositories` would put an added
+// repository before Central, where it could stand in for anything Central has; appended, it is
+// asked only for what Central does not have. resolverOrder lists them, in order, as repo-guard
+// reads them; repo-guard refuses a module that resolves dependencies without it.
+trait TaiheiRepositories extends CoursierModule {
+  override def repositoriesTask: Task[Seq[coursier.Repository]] = Task.Anon {
+    coursierConfigModule().defaultRepositories() :+ TaiheiOnly(coursier.maven.MavenRepository(release.repoUrl))
+  }
+
   def resolverOrder: T[Seq[String]] = Task {
     repositoriesTask().map {
       case t: TaiheiOnly                     => t.repr
@@ -210,17 +219,8 @@ trait TaiheiResolverOrder extends CoursierModule {
   }
 }
 
-trait TaiheiPublishSettings extends PublishModule with TaiheiResolverOrder {
+trait TaiheiPublishSettings extends PublishModule with TaiheiRepositories {
   def publishVersion = release.gitVersion()
-
-  // Coursier's defaults (Maven Central), then the family's repository for dev.taihei alone, and
-  // nothing else. Mill's own `repositories` would put an added repository before Central, where it
-  // could stand in for anything Central has; appended, it is asked only for what Central does not
-  // have. The test modules use their module's repositories. repo-guard reads resolverOrder.
-  override def repositoriesTask: Task[Seq[coursier.Repository]] = Task.Anon {
-    coursierConfigModule().defaultRepositories() :+ TaiheiOnly(coursier.maven.MavenRepository(release.repoUrl))
-  }
-
 
   // What a published jar holds comes only from folders in git: no default folder under the
   // module's directory, where a stray file would go into a jar unnoticed. A module that has
@@ -259,7 +259,7 @@ trait TaiheiModule extends ScalaModule with ScalafmtModule with TaiheiScalafix w
     "-java-output-version:17",
   )
 
-  trait TaiheiTests extends ScalaTests with ScalafmtModule with TaiheiScalafix with TaiheiResolverOrder {
+  trait TaiheiTests extends ScalaTests with ScalafmtModule with TaiheiScalafix with TaiheiRepositories {
     def testFramework = "zio.test.sbt.ZTestFramework"
 
     // The JDK the tests run on: the module's (Mill's own) unless TAIHEI_TEST_JAVA_HOME names
@@ -308,7 +308,7 @@ trait TaiheiJSModule extends ScalaJSModule with ScalafmtModule with TaiheiScalaf
     mvn"org.scala-js::scalajs-java-securerandom::${V.scalaJsSecureRandom}".withDottyCompat(V.scala),
   )
 
-  trait TaiheiJSTests extends ScalaJSTests with ScalafmtModule with TaiheiScalafix with TaiheiResolverOrder {
+  trait TaiheiJSTests extends ScalaJSTests with ScalafmtModule with TaiheiScalafix with TaiheiRepositories {
     def testFramework = "zio.test.sbt.ZTestFramework"
 
     def mvnDeps = Seq(
@@ -795,8 +795,9 @@ object mihon extends Module {
   }
 
   // A Scala.js program that uses every language, never published: its full-linked size is the
-  // budget's measure of what Mihon adds to a browser bundle.
-  object budgetFixture extends ScalaJSModule with ScalafmtModule {
+  // budget's measure of what Mihon adds to a browser bundle. Its linker and dependencies run here
+  // and in CI, so it resolves as the published modules do.
+  object budgetFixture extends ScalaJSModule with ScalafmtModule with TaiheiRepositories {
     def scalaVersion   = V.scala
     def scalaJSVersion = V.scalaJS
     def moduleDeps     = Seq(js)

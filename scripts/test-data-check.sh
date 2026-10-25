@@ -13,7 +13,7 @@ FAILED=0
 
 fresh() { rm -rf "$T/r"; cp -R shared/resources "$T/r"; }
 check() { ./mill --ticker false mihon.checkData --folder "$T/r" > "$T/out" 2>&1; }
-edit() { python3 -I -c "import json,sys; p=sys.argv[1]; d=json.load(open(p)); exec(sys.argv[2]); open(p,'w').write(json.dumps(d, ensure_ascii=False))" "$T/r/$D/$1" "$2"; }
+edit() { python3 -I -B -c "import json,sys; p=sys.argv[1]; d=json.load(open(p)); exec(sys.argv[2]); open(p,'w').write(json.dumps(d, ensure_ascii=False))" "$T/r/$D/$1" "$2"; }
 
 accepts() {
   fresh; if check; then echo "[ok] accepts the data as it is"; else echo "[FAIL] refuses the data as it is"; cat "$T/out"; FAILED=1; fi
