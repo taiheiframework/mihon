@@ -80,7 +80,7 @@ the reservation is cited here; elsewhere a number may be real.
   are left out in Chinese, where they are transcribed foreign names. In Russian, Ukrainian,
   Bulgarian, Serbian, Greek and Thai, whose names Wikidata spells as items of their own, a name
   item that states only another writing system (P282) is a transcription and is left out, except
-  in Thai when most of the item's bearers on Wikidata are Thai citizens: Thai names are often
+  in Thai when at least half of the item's bearers on Wikidata are Thai citizens: Thai names are often
   recorded as Latin-script items with a Thai label (Sunisa, สุนิสา), where Anna (แอนนา), borne
   mostly elsewhere, stays out; and a
   Cyrillic name must use only its alphabet's letters (no Serbian Ј in a Russian name); a Thai name
@@ -100,7 +100,8 @@ the reservation is cited here; elsewhere a number may be real.
   they are the second half of Jean-Marie or Jan Maria), the Arabic latin forms Zainab and
   Suleiman where the English label has Zeynep and Solomon, Hindi labels that translate an English
   name instead of naming (समानता, "equality", for Samantha) or hold more than a name, the latin
-  form Mohit, and the most frequent European names written in Devanagari. Arabic names use the Arabic ي where a
+  form Mohit, the most frequent European names written in Devanagari, and two foreign names
+  written in Thai script (มานูเอลา, Manuela; ริตู, Ritu). Arabic names use the Arabic ي where a
   label has the Persian ی.
 - **Romanisation.** The `latin` form is computed by rule where one exists: ICAO 9303 for Russian
   (with the national variants for Ukrainian, Bulgarian and Serbian), ELOT 743 for Greek, Hepburn
@@ -546,6 +547,7 @@ the reservation is cited here; elsewhere a number may be real.
 | wikidata/given-VN-af5938172bba.json (Wikidata Query Service) | 2026-10-24 | 220940 | `fbb391dbf9880c9335d428f451d03a27d0ddfdc5a5ff4035a22e7e1db42a91c3` |
 | wikidata/given-VN-c86a6ca1426c.json (Wikidata Query Service) | 2026-10-24 | 183795 | `be51471b48419146fc3a15fb0946532f775f2d3dec85669b46f6b09a2fc0e4ce` |
 | wikidata/given-bearers-TH-974a297a5628.json (Wikidata Query Service) | 2026-10-25 | 9646 | `579255dc8276a59246b2b1869f27e75c979219d6bb16d2714809522abcaae0e8` |
+| wikidata/given-bearers-TH-e8b9921e25cd.json (Wikidata Query Service) | 2026-10-25 | 9646 | `8cddf9512fb714852618232998cf0273955d1320dd01f998405097c3ae982166` |
 | wikidata/given-labels-BG-bg-0-ef8d1569a824.json (Wikidata Query Service) | 2026-10-24 | 165790 | `45174df33b48471076ca845df4f0f5423066ce22d6f320cd96ee30ec7eaa1602` |
 | wikidata/given-labels-BG-bg-0-fd2cca54c71b.json (Wikidata Query Service) | 2026-10-24 | 163506 | `8ad7953cfdfcbc4fa88cc76f89053203c3df26e747043a4ff3513f8106091327` |
 | wikidata/given-labels-BG-bg-1200-808c6e198837.json (Wikidata Query Service) | 2026-10-24 | 117560 | `0fe3b09deb9edc5d3ad9e5e80da149723fcd7a8c19921cabed2b7cf5dcf5d65c` |

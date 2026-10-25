@@ -113,9 +113,10 @@ FOREIGN_NAMES_LEFT_OUT = {"hi"}
 # and Văn, a nickname ("macaroni"), Hindi labels that translate an English label instead of
 # naming (समानता "equality" for Samantha, हवा "air" for Pawan), and Hindi labels that hold more
 # than a name (an honorific, a family name, an epithet, "the Telugu language"), and Kaur, which
-# stands after a Sikh woman's given name rather than for it. By list: Maria or
+# stands after a Sikh woman's given name rather than for it. Thai: the Spanish Manuela and the
+# Hindi Ritu, name items in Thai script with no Thai bearer, transcriptions of foreign names. By list: Maria or
 # Marie as a man's name is the second half of Jean-Marie or Jan Maria, and ललिता is a woman's name.
-NOT_GIVEN = {"vi": {"Thị", "Văn"}, "ar": {"مكرونه", "مكرونة"},
+NOT_GIVEN = {"vi": {"Thị", "Văn"}, "ar": {"مكرونه", "مكرونة"}, "th": {"มานูเอลา", "ริตู"},
              "hi": {"समानता", "संतुष्टि", "हवा", "मोहिनी अवतार", "श्री गायत्री देवी", "सुयश दास", "तेलुगु भाषा",
                     "कौर"}}
 NOT_GIVEN_BY_GENDER = {(t, "male"): {"Maria", "Marie", "María"} for t in ("fr", "nl", "it", "pl", "de", "es", "pt")}
@@ -258,14 +259,15 @@ def _form(tag, script, name, en, kana, family_name=False):
 
 
 # The writing system (P282) of the name items of a language whose people carry too few name
-# statements on Wikidata.
+# statements on Wikidata, or whose counted names mostly have no label in the language (Thai given
+# names): its name items are added to the counted ones.
 WRITING_SYSTEM = {"th": "Q236376"}
 
 
 def _native(kind, cls, lang):
     """Name items of the class whose native label (P1705) is in the language, or that are written
-    in its script, for a country whose people carry too few name statements on Wikidata: each
-    counts as borne once."""
+    in its script, for a language in WRITING_SYSTEM or a country whose people carry too few name
+    statements on Wikidata: each counts as borne once."""
     script = WRITING_SYSTEM.get(lang)
     by_script = f"UNION {{ ?item wdt:P31 wd:{cls}; wdt:P282 wd:{script} }}" if script else ""
     rows = sparql(f"{kind}-native-{lang}", f"""
@@ -281,12 +283,14 @@ def _native(kind, cls, lang):
 OWN_ROMANISED = {"th"}
 
 
-def _own_romanised(country, script, tag, counts, labels):
+def _own_romanised(country, script, tag, counts, labels, added):
     """The name items in another script whose label in the language is the language's own name:
-    those that most of their bearers on Wikidata (born since 1920) bear as citizens of the
-    country. Only the counts are read, nothing about any person."""
+    those that at least half of their bearers on Wikidata (born since 1920) bear as citizens of the
+    country. An added item has no counted bearer, so it is no candidate. Only the counts are
+    read, nothing about any person."""
     candidates = sorted(item for item, r in labels.items()
-                        if item in counts and r.get("label") and _name_ok(r["label"], script)
+                        if item in counts and item not in added and r.get("label")
+                        and _name_ok(r["label"], script)
                         and not _name_ok(r["label"], script, tag, r.get("systems", set())))
     if not candidates:
         return set()
@@ -320,7 +324,7 @@ def given(tag, conf, limit=120):
                     counts[item] = [1, 0] if i == 0 else [0, 1]
                     added.add(item)
     labels = _labels("given", country, lang, counts)
-    own = _own_romanised(country, script, tag, counts, labels) if tag in OWN_ROMANISED else set()
+    own = _own_romanised(country, script, tag, counts, labels, added) if tag in OWN_ROMANISED else set()
     lists = {"female": [], "male": []}
     # At the same weight a name with a counted bearer comes before an added one, so an added name
     # fills a list but never takes the place of a counted one.

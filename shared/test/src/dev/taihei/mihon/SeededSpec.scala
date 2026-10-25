@@ -364,10 +364,10 @@ object SeededSpec extends ZIOSpecDefault:
     ),
     "th" -> List(
       "วันเธอสถานีตัดสินกังวลเห็นแห้งไม่ดีใจม้าไม่ใช่",
-      "รจนา ทองเดชศรี",
-      "Rodjana Thongdejsri",
+      "รัญชน์รวี ทองเดชศรี",
+      "Ranchrawee Thongdejsri",
       "-",
-      "thongkam.chochuwong@lunarbytefusion.example",
+      "sasithorn.chochuwong@lunarbytefusion.example",
       "114 ถนนรัชดาภิเษก นนทบุรี 35772 ไทย",
       "+66 84 953 7547",
       "จัง",

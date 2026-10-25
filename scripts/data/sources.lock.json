@@ -2453,6 +2453,12 @@
     "bytes": 9646,
     "retrieved": "2026-10-25"
   },
+  "wikidata/given-bearers-TH-e8b9921e25cd.json": {
+    "url": "https://query.wikidata.org/sparql (query in scripts/data)",
+    "sha256": "8cddf9512fb714852618232998cf0273955d1320dd01f998405097c3ae982166",
+    "bytes": 9646,
+    "retrieved": "2026-10-25"
+  },
   "wikidata/given-labels-BG-bg-0-ef8d1569a824.json": {
     "url": "https://query.wikidata.org/sparql (query in scripts/data)",
     "sha256": "45174df33b48471076ca845df4f0f5423066ce22d6f320cd96ee30ec7eaa1602",
