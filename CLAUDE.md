@@ -60,7 +60,8 @@ command line; never read or print `~/.edo-release.env`.
   `private[mihon]`. It follows semantic versioning; a break is a major release with a migration
   section in the README.
 - Every dependency comes from Maven Central under an Apache-compatible licence (a dev.taihei
-  version not on Central yet from `REPO_URL`); the build needs no credentials. taihei-tsuji is pinned in `V.taiheiTsuji` and released first.
+  version not on Central yet from `REPO_URL`); the build needs no credentials. taihei-tsuji is
+  pinned in `V.taiheiTsuji` and released first.
 - Data is generic (common names, real cities, words, MIME types), every piece from a source named
   in `docs/data-sources.md` under an Apache-compatible licence: nothing taken from a client or a
   person, nothing CC BY-SA, no sentence from any source.
