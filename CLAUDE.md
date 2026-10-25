@@ -10,21 +10,26 @@ from the parent folder's `CLAUDE.md` when this repo is checked out under `~/Proj
 ```bash
 make validate          # repo-guard, release and data-check tests, scalafix, scalafmt, compile, test, MiMa and budget, JVM and JS
 make budget            # size budget: data per language and in all, JVM jar, Scala.js fixture
-make repo-guard        # Maven Central only: no other repository, every dev.taihei pin on Central
-make mima              # binary compatibility with the newest 5.x release tag on Maven Central
+make repo-guard        # Central, then REPO_URL only; pins released; resolved dev.taihei files checked
+make mima              # against the newest 5.x tag, which must be on Central or REPO_URL
+                       # (between a tag push and publish-repo it fails; MIMA_BASELINE=x.y.z)
 make test              # ./mill __.test.testForked (JS tests run under Node)
 make publish-dry-run   # the bundle Maven Central would receive, written to out/
 make release-prepare TYPE=patch|minor|major EMBARGO=0|1   # then review RELEASE_x_y_z.md;
                        # EMBARGO=1 when the ticket has the label embargo (read it with fude first)
-make release-finalize  # GitHub Packages and the read-back: only with the maintainer's yes
-make release-github    # after the push: the bundle on an immutable GitHub Release
+make release-finalize  # the signed bundle and its checks, tag local: only with the maintainer's yes
+make release-github    # after the push: the immutable GitHub Release, which publishes the version
+make publish-repo      # the family repository's deploy, then verify-repo reads every file back
 ```
 
-Releases follow ADR 0003: one signed bundle, uploaded unchanged to this repository's GitHub
-Packages registry, read back, tagged and pushed, kept on an immutable GitHub Release, and taken
-to Maven Central by the next release train in nakama. A security fix (`EMBARGO=1`) goes to
-Central first with `make publish`. The publish token lives in `~/.taihei-packages-publish.env`,
-the read token in Coursier's credentials file; never read or print either.
+Releases follow ADR 0004: one signed bundle, built locally by release-finalize (nothing is
+uploaded), then main and the tag are pushed, release-github keeps it on an immutable GitHub
+Release, the family's Maven repository (`REPO_URL`, the same string as `release.repoUrl` in
+build.mill) serves it from there, and the next release train in nakama takes it to Maven Central.
+A security fix (`EMBARGO=1`) goes to Central first with `make publish`, and gets its GitHub
+Release from Central's files (`make central-bundle`) after its advisory. The machinery is shared
+with tsuji: keep everything but the per-library lines identical. Credentials never go on make's
+command line; never read or print `~/.edo-release.env`.
 
 ## Layout
 
@@ -54,8 +59,8 @@ the read token in Coursier's credentials file; never read or print either.
 - The public API is `Mihon`, `Person`, `Address`, `Gender` and `SampleImages`; everything else is
   `private[mihon]`. It follows semantic versioning; a break is a major release with a migration
   section in the README.
-- Every dependency comes from Maven Central under an Apache-compatible licence; the build needs no
-  credentials. taihei-tsuji is pinned in `V.taiheiTsuji` and released first.
+- Every dependency comes from Maven Central under an Apache-compatible licence (a dev.taihei
+  version not on Central yet from `REPO_URL`); the build needs no credentials. taihei-tsuji is pinned in `V.taiheiTsuji` and released first.
 - Data is generic (common names, real cities, words, MIME types), every piece from a source named
   in `docs/data-sources.md` under an Apache-compatible licence: nothing taken from a client or a
   person, nothing CC BY-SA, no sentence from any source.
