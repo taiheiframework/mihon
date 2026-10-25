@@ -2,6 +2,7 @@ package dev.taihei.mihon
 
 import zio.test.*
 
+import dev.taihei.mihon.data.LanguageData
 import dev.taihei.mihon.sources.ResourceLoader
 
 // The JVM reads the data files from the classpath, Scala.js from the copy the build compiles in.
@@ -28,6 +29,15 @@ object DataSpec extends ZIOSpecDefault:
         Seq(s"$dir/text.json", s"$dir/names.json", s"$dir/countries.json", s"$dir/country-$country.json")
       }.toSet + "/dev/taihei/mihon/data/languages.json"
       assertTrue(DataManifest.files.keySet == expected)
+    },
+    // The floors the size budget may not trim below, in every language but Latin, which is
+    // written by hand from Lorem Ipsum and the Roman names and is exempt by design.
+    test("every language but Latin has 1000 words, 100 given names per gender and 120 family names") {
+      val short = LanguageData.all.filter(_.entry.tag != "la").filterNot { d =>
+        d.text.words.size >= 1000 && d.names.female.size >= 100 && d.names.male.size >= 100 &&
+        d.names.family.size >= 120
+      }
+      assertTrue(LanguageData.all.exists(_.entry.tag == "th"), short.map(_.entry.tag).isEmpty)
     },
     test("an unknown file is a packaging error, not empty data") {
       assertTrue(scala.util.Try(ResourceLoader.load("/dev/taihei/mihon/data/no-such.json")).isFailure)

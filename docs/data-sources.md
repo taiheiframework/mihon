@@ -74,11 +74,15 @@ the reservation is cited here; elsewhere a number may be real.
   Netherlands), weighted by that count; only the counts and the names' own labels are
   taken, nothing about any person. A given name is on the female or the male list by the gender
   of its bearers (both, when at least a third are of each). Where a country's people carry too
-  few name statements (Thailand), name items with a native label in the language (P1705), or
-  written in its script (P282), are added with a weight of one. Names longer than two characters
+  few name statements, or most of their names have no label in the language (Thailand), name
+  items with a native label in the language (P1705), or written in its script (P282), are added
+  with a weight of one, after the counted names of the same weight. Names longer than two characters
   are left out in Chinese, where they are transcribed foreign names. In Russian, Ukrainian,
   Bulgarian, Serbian, Greek and Thai, whose names Wikidata spells as items of their own, a name
-  item that states only another writing system (P282) is a transcription and is left out, and a
+  item that states only another writing system (P282) is a transcription and is left out, except
+  in Thai when most of the item's bearers on Wikidata are Thai citizens: Thai names are often
+  recorded as Latin-script items with a Thai label (Sunisa, สุนิสา), where Anna (แอนนา), borne
+  mostly elsewhere, stays out; and a
   Cyrillic name must use only its alphabet's letters (no Serbian Ј in a Russian name); a Thai name
   holds no space, and an Arabic name no part shorter than three letters (a compound cut short).
   Where the latin form is an English label (Arabic, Thai), its initial must fit the name's first
@@ -123,10 +127,9 @@ the reservation is cited here; elsewhere a number may be real.
   letter for letter), weighted by population in
   thousands, with their first-level region where the address format names one.
 - **Sizes.** Each language holds at least 1000 words, 100 given names per gender and 120 family
-  names, in at most 80 KB of data, with two exceptions. Latin is written by hand by design: the
-  503 words of Lorem Ipsum, 20 given names per gender and 30 family names. Thai has 92 female
-  given names, the ones that pass the filters above; a later version adds more from a source
-  whose licence has been checked.
+  names, in at most 80 KB of data, with one exception: Latin is written by hand by design, the
+  503 words of Lorem Ipsum, 20 given names per gender and 30 family names. A test
+  (`DataSpec`) holds every other language to these floors.
 
 ## Downloads
 
@@ -526,6 +529,8 @@ the reservation is cited here; elsewhere a number may be real.
 | wikidata/given-NL-baf6eccb6ea5.json (Wikidata Query Service) | 2026-10-24 | 243231 | `86a4c89c443b4485bbc6422e8b6baeda1f9fa8b00aad35f2b5b27d8d87ee34d4` |
 | wikidata/given-PL-a12c348a5e6f.json (Wikidata Query Service) | 2026-10-24 | 546017 | `2df04e722369627678d6450a8e6d2c860eeda3ba8e3680108598eb942a85d356` |
 | wikidata/given-PL-a1556f440136.json (Wikidata Query Service) | 2026-10-24 | 545844 | `a908af82774b3209fbf28e4c407d05e8e6b85c54efc9888fec69e5c90095c0f9` |
+| wikidata/given-Q11879590-native-th-00a116f2bef4.json (Wikidata Query Service) | 2026-10-25 | 13284 | `36e41c16f4901e677b8446a4f18e7cd5c38a419fd74b8a18adee0e155c06d521` |
+| wikidata/given-Q12308941-native-th-02a96d2b6250.json (Wikidata Query Service) | 2026-10-25 | 15679 | `b920987e90245ca89d085668a522f05a00d8e3f75c12b93565c6b004613162c9` |
 | wikidata/given-RS-1a62c1887ddc.json (Wikidata Query Service) | 2026-10-24 | 446880 | `6f8f3ef14bb0d04feca1e4527247608408317b98544185771e24d9e7ee316471` |
 | wikidata/given-RS-c6944c0f5930.json (Wikidata Query Service) | 2026-10-24 | 402425 | `6caefcd9d09d8db9a16ff35f644185f650643f593930783fb99300692b1393ba` |
 | wikidata/given-RU-c511b7d00e5e.json (Wikidata Query Service) | 2026-10-24 | 546072 | `a2a31b1fd6d6c3c56c52893c7ef569b2dab7a33c2506d50b599ce23e93fa7b62` |
@@ -540,6 +545,7 @@ the reservation is cited here; elsewhere a number may be real.
 | wikidata/given-UA-c2c5ac9dcdca.json (Wikidata Query Service) | 2026-10-24 | 546851 | `6d89a00924e88594a49ab4036c042368794019107d03372a2c76747d6b3f4153` |
 | wikidata/given-VN-af5938172bba.json (Wikidata Query Service) | 2026-10-24 | 220940 | `fbb391dbf9880c9335d428f451d03a27d0ddfdc5a5ff4035a22e7e1db42a91c3` |
 | wikidata/given-VN-c86a6ca1426c.json (Wikidata Query Service) | 2026-10-24 | 183795 | `be51471b48419146fc3a15fb0946532f775f2d3dec85669b46f6b09a2fc0e4ce` |
+| wikidata/given-bearers-TH-974a297a5628.json (Wikidata Query Service) | 2026-10-25 | 9646 | `579255dc8276a59246b2b1869f27e75c979219d6bb16d2714809522abcaae0e8` |
 | wikidata/given-labels-BG-bg-0-ef8d1569a824.json (Wikidata Query Service) | 2026-10-24 | 165790 | `45174df33b48471076ca845df4f0f5423066ce22d6f320cd96ee30ec7eaa1602` |
 | wikidata/given-labels-BG-bg-0-fd2cca54c71b.json (Wikidata Query Service) | 2026-10-24 | 163506 | `8ad7953cfdfcbc4fa88cc76f89053203c3df26e747043a4ff3513f8106091327` |
 | wikidata/given-labels-BG-bg-1200-808c6e198837.json (Wikidata Query Service) | 2026-10-24 | 117560 | `0fe3b09deb9edc5d3ad9e5e80da149723fcd7a8c19921cabed2b7cf5dcf5d65c` |
@@ -723,10 +729,12 @@ the reservation is cited here; elsewhere a number may be real.
 | wikidata/given-labels-RU-ru-800-defe2a662761.json (Wikidata Query Service) | 2026-10-24 | 185322 | `a897d2b8064ef962e0a9ab325a4f0e803b3561d8cd23399076e6df5dc7d44324` |
 | wikidata/given-labels-RU-ru-800-eba0a102a36f.json (Wikidata Query Service) | 2026-10-24 | 130967 | `78b7e8f8492dc96cb7f9ae765704803189a1ef0d22e562aa224b2b1632b871f6` |
 | wikidata/given-labels-TH-th-0-2a0f69e78fc7.json (Wikidata Query Service) | 2026-10-24 | 159272 | `f75e6f6f98893ffdeb1728615b67497ddf67de3eebb58ee5f3d28977eedbe50c` |
+| wikidata/given-labels-TH-th-0-31d30d64a7aa.json (Wikidata Query Service) | 2026-10-25 | 160592 | `a8fd1f5c11ad66a3498ec7c92e8af00992a8b497db673bb5a1e77a44d30a5df2` |
 | wikidata/given-labels-TH-th-0-c9b891430754.json (Wikidata Query Service) | 2026-10-24 | 92421 | `f20da4cf40f5a2eb0959f5580cb5bf23db3c8354d7568145f0289897ad8da362` |
 | wikidata/given-labels-TH-th-0-da053ee55011.json (Wikidata Query Service) | 2026-10-24 | 160239 | `a1738a0aef1ad460f698294e7dd837dd8f8932d95e78f7c44713c06102bd4622` |
 | wikidata/given-labels-TH-th-0-e850d9c4650c.json (Wikidata Query Service) | 2026-10-24 | 116436 | `cb6dc31f44568b900d7a90164c67907d5fa16f0e484787ddfab83f25e233ccb0` |
 | wikidata/given-labels-TH-th-400-37675ad57a37.json (Wikidata Query Service) | 2026-10-24 | 138055 | `ae021f858308070c34e74abab54dcd6ca8ddc0bab8e59834216885e00d990a75` |
+| wikidata/given-labels-TH-th-400-76d4afe9a18b.json (Wikidata Query Service) | 2026-10-25 | 138688 | `dc30e2148974197428b4faab0695f880043afbc21b002db6c25872ed0b6d0212` |
 | wikidata/given-labels-TH-th-400-7c0298269678.json (Wikidata Query Service) | 2026-10-24 | 137846 | `b68f09c1c6e667a53ef0f2b0e2c1835d62f93768be3f189ea00a89e9ae3f7e9e` |
 | wikidata/given-labels-TH-th-400-cd35b625fdb2.json (Wikidata Query Service) | 2026-10-24 | 91417 | `1c623e552f004f0a675eaf4912f3f78be4f9c6201ce62cfebd6ea497b454903b` |
 | wikidata/given-labels-TH-th-400-e3316e82db16.json (Wikidata Query Service) | 2026-10-24 | 95647 | `e0a54051c12f374f964d355fc09cae6b630f6c653a3474fda0f4a2821d53cb4f` |
@@ -734,6 +742,7 @@ the reservation is cited here; elsewhere a number may be real.
 | wikidata/given-labels-TH-th-800-cf7fe2ca53c3.json (Wikidata Query Service) | 2026-10-24 | 92526 | `eaf0fedcb8ec8f6597e02ee6780b046da8d55f5ddf5a89b5f1e96b85e06455d5` |
 | wikidata/given-labels-TH-th-800-eaf54ad692a0.json (Wikidata Query Service) | 2026-10-24 | 90662 | `acd2ac43498845f7c9f5896cca8530085e2274b41c9e894727f5366a148eb6a6` |
 | wikidata/given-labels-TH-th-800-fb824d923e01.json (Wikidata Query Service) | 2026-10-24 | 111987 | `cf083b6ab961d42acc31401d0bdb95263ed3b8a8601120c8e8c625418f582d58` |
+| wikidata/given-labels-TH-th-800-fc5b94a60994.json (Wikidata Query Service) | 2026-10-25 | 118484 | `c3242ff489a6e8180557336878aeef72d280e06a33c4d430b8ba470503cb3d98` |
 | wikidata/given-labels-TR-tr-0-d33e8cfe0e90.json (Wikidata Query Service) | 2026-10-24 | 205558 | `b5e1ed7efa117cd39620f26ea74e67136297bd57783e2e21690b61225049c134` |
 | wikidata/given-labels-TR-tr-0-f9cbc6ec6320.json (Wikidata Query Service) | 2026-10-24 | 205630 | `abf593b7e3f94ac5fc4c168ae353596f285f6e32fffe787ed9d30f889ae7d045` |
 | wikidata/given-labels-TR-tr-1200-032bc23b0291.json (Wikidata Query Service) | 2026-10-24 | 121059 | `900b2f324740e2f26a4fe403ef364cd21091a2c5fda41b7bbbcd8b010c579fb1` |

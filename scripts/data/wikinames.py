@@ -275,6 +275,32 @@ def _native(kind, cls, lang):
     return [_qid(r["item"]) for r in rows]
 
 
+# The languages whose own names Wikidata often records as items in Latin script, with the label
+# in the language beside them (Sunisa, labelled สุนิสา), so that the writing-system rule of
+# STRICT_WRITING would leave them out with the transcriptions of foreign names (Anna, แอนนา).
+OWN_ROMANISED = {"th"}
+
+
+def _own_romanised(country, script, tag, counts, labels):
+    """The name items in another script whose label in the language is the language's own name:
+    those that most of their bearers on Wikidata (born since 1920) bear as citizens of the
+    country. Only the counts are read, nothing about any person."""
+    candidates = sorted(item for item, r in labels.items()
+                        if item in counts and r.get("label") and _name_ok(r["label"], script)
+                        and not _name_ok(r["label"], script, tag, r.get("systems", set())))
+    if not candidates:
+        return set()
+    values = " ".join("wd:" + i for i in candidates)
+    rows = sparql(f"given-bearers-{country}", f"""
+        SELECT ?name (COUNT(?p) AS ?c) WHERE {{
+          VALUES ?name {{ {values} }}
+          ?p wdt:P735 ?name .
+          {BORN_SINCE}
+        }} GROUP BY ?name""")
+    everywhere = {_qid(r["name"]): int(r["c"]) for r in rows}
+    return {i for i in candidates if 2 * sum(counts[i]) >= everywhere.get(i, 0) > 0}
+
+
 def entry_latin(en):
     return romanize.ascii_fold(en).replace("-", "").replace(" ", "").capitalize() if en else None
 
@@ -282,18 +308,27 @@ def entry_latin(en):
 def given(tag, conf, limit=120):
     country, script, lang = conf["country"], conf["script"], conf["wikidata"]
     counts = _counts("given", country, "P735", True)
-    if len(counts) < 2 * limit:
+    added = set()
+    # Thai people on Wikidata carry many given-name statements, but most of those names have no
+    # Thai label, so the counted names alone fill too short a female list: the name items written
+    # in the script are added there too, as they are for family names.
+    if len(counts) < 2 * limit or lang in WRITING_SYSTEM:
         # A given name without counted bearers gets a weight of one, in the list of its class.
         for cls, i in (("Q11879590", 0), ("Q12308941", 1)):
             for item in _native(f"given-{cls}", cls, lang):
                 if item not in counts:
                     counts[item] = [1, 0] if i == 0 else [0, 1]
+                    added.add(item)
     labels = _labels("given", country, lang, counts)
+    own = _own_romanised(country, script, tag, counts, labels) if tag in OWN_ROMANISED else set()
     lists = {"female": [], "male": []}
-    for item, (f, m) in sorted(counts.items(), key=lambda kv: (-sum(kv[1]), kv[0])):
+    # At the same weight a name with a counted bearer comes before an added one, so an added name
+    # fills a list but never takes the place of a counted one.
+    for item, (f, m) in sorted(counts.items(), key=lambda kv: (-sum(kv[1]), kv[0] in added, kv[0])):
         r = labels.get(item, {})
         name = _native_form(tag, r["label"]) if r.get("label") else None
-        if not name or not _name_ok(name, script, tag, r.get("systems", set())):
+        systems = set() if item in own else r.get("systems", set())
+        if not name or not _name_ok(name, script, tag, systems):
             continue
         if script in ("Hans", "Hant") and len(name) > 2:
             continue  # a transcribed foreign name, such as 约瑟夫
