@@ -137,9 +137,10 @@ link) or the environment (`MILL_SONATYPE_USERNAME`,
 `MILL_SONATYPE_PASSWORD`, `MILL_PGP_SECRET_BASE64`, `MILL_PGP_PASSPHRASE`).
 The dry run that builds the release bundle gets the release key but never the
 Central token, neither from that file nor from the shell. The `mill` launcher
-downloads Mill over HTTPS only and keeps a download only when its SHA-256
-matches the one pinned in the launcher; a copy already in Mill's cache is not
-checked again. `release-preflight` (inside `release-finalize`), `release-github`
+downloads Mill over HTTPS only, and runs Mill only when its SHA-256 matches the
+one pinned in the launcher: it checks a download before keeping it, and the
+file it is about to run before every run, so a tampered copy in Mill's cache is
+refused, as is a version without a pin. `release-preflight` (inside `release-finalize`), `release-github`
 and `publish-repo` use the maintainer's `gh` login; nothing else in a release
 needs a token.
 Releases are signed by the Taihei Framework release key,
