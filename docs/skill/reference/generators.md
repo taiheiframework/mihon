@@ -8,8 +8,9 @@ language.
 
 | Member | Returns |
 | --- | --- |
-| `Mihon.seeded(seed: Long, language: Language = Language.English, clock: Clock = Clock.systemUTC()): Mihon` | values that repeat for the same seed, language, clock and Mihon version, on the JVM and Scala.js |
+| `Mihon.seeded(seed: Long, language: Language = Language.English, clock: Clock = Clock.fixed(Mihon.SeededInstant, ZoneOffset.UTC)): Mihon` | values that repeat for the same seed, language, clock and Mihon version, on the JVM and Scala.js; without a clock, dates are relative to 2026-01-01 |
 | `Mihon.secure(language: Language = Language.English, clock: Clock = Clock.systemUTC()): Mihon` | values from a `SecureRandom`, which do not repeat |
+| `Mihon.SeededInstant: Instant` | 2026-01-01T00:00:00Z, where a `seeded` generator's default clock stands; fixed within a major |
 | `Mihon.languages: List[Language]` | the languages with data, sorted by tag |
 | `Mihon.resolve(language: Language): Option[Language]` | the language a factory would use, or `None` |
 

@@ -12,7 +12,7 @@ make validate          # repo-guard, release and data-check tests, scalafix, sca
 make budget            # size budget: data per language and in all, JVM jar, Scala.js fixture
 make repo-guard        # Coursier's defaults (local Ivy, Central), then REPO_URL for dev.taihei alone;
                        # pins released; resolved dev.taihei files checked
-make mima              # against the newest 5.x tag, which must be on Central or REPO_URL
+make mima              # against the newest tag of release.majorLine (none yet on 6.x), on Central or REPO_URL
                        # (between a tag push and publish-repo it fails; MIMA_BASELINE=x.y.z)
 make test              # ./mill __.test.testForked (JS tests run under Node)
 make publish-dry-run   # the bundle Maven Central would receive, written to out/

@@ -1,7 +1,7 @@
 package dev.taihei.mihon
 
 import java.security.SecureRandom
-import java.time.{Clock, LocalDate}
+import java.time.*
 import java.util.{Random, UUID}
 
 import dev.taihei.mihon.data.{LanguageData, Pattern}
@@ -386,17 +386,28 @@ end Mihon
 object Mihon:
 
   /**
+   * The instant a [[seeded]] generator's clock stands at unless it is given another: midnight
+   * at the start of 1 January 2026, UTC. It never changes within a major version, because every
+   * seeded date depends on it.
+   */
+  val SeededInstant: Instant = Instant.parse("2026-01-01T00:00:00Z")
+
+  /**
    * A generator whose values repeat. The same seed, language, clock and Mihon version give the
-   * same values in the same order, on the JVM and on Scala.js. Any other Mihon version, a patch
-   * included, may give other values; the release notes say so whenever they do. Pin the Mihon
-   * version to assert on a seed's values.
+   * same values in the same order, on the JVM and on Scala.js, whatever the day: unless it is
+   * given a clock, its [[Mihon.today]] is the date of [[SeededInstant]], so its dates repeat too.
+   * Any other Mihon version, a patch included, may give other values; the release notes say so
+   * whenever they do. Pin the Mihon version to assert on a seed's values.
    *
    * {{{
    * import java.time.{Clock, Instant, ZoneOffset}
    *
+   * Mihon.seeded(42L).today // 2026-01-01, on any day
+   *
    * val clock = Clock.fixed(Instant.parse("2026-10-24T12:00:00Z"), ZoneOffset.UTC)
-   * val mihon = Mihon.seeded(42L, clock = clock)
-   * mihon.today // 2026-10-24
+   * Mihon.seeded(42L, clock = clock).today // 2026-10-24
+   *
+   * Mihon.seeded(42L, clock = Clock.systemUTC()).today // the real date, in UTC
    *
    * Mihon.seeded(42L, Language("la")).paragraph // Lorem Ipsum
    * }}}
@@ -406,15 +417,16 @@ object Mihon:
    * @param language
    *   the language of the data, English by default; resolved as [[resolve]] says
    * @param clock
-   *   where [[Mihon.today]] and the dates relative to it come from; the system clock in UTC by
-   *   default
+   *   where [[Mihon.today]] and the dates relative to it come from; by default a clock fixed at
+   *   [[SeededInstant]] in UTC, so that dates repeat with the seed. Pass `Clock.systemUTC()` for
+   *   dates relative to the real date.
    * @throws IllegalArgumentException
    *   when Mihon has no data for `language`
    */
   def seeded(
     seed: Long,
     language: Language = Language.English,
-    clock: Clock = Clock.systemUTC(),
+    clock: Clock = Clock.fixed(SeededInstant, ZoneOffset.UTC),
   ): Mihon =
     new Mihon(new Random(seed), clock, dataFor(language))
 

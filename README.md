@@ -277,17 +277,23 @@ its own clock. Create one of two kinds:
   Any other Mihon version, a patch included, may give other values; the release notes say so
   whenever they do. Pin the Mihon version to assert on a seed's values.
 
-Both take the language and a `java.time.Clock`, `Clock.systemUTC()` by default. `today`,
-`yesterday`, `tomorrow`, `futureDate` and `pastDate` follow the clock:
+Both take the language and a `java.time.Clock`. `today`, `yesterday`, `tomorrow`, `futureDate`
+and `pastDate` follow the clock. `secure` uses `Clock.systemUTC()` by default. `seeded` uses a
+clock fixed at `Mihon.SeededInstant`, 2026-01-01T00:00:00Z, so its dates repeat with the seed on
+any day; pass another clock for other dates:
 
 ```scala
 import java.time.{Clock, Instant, ZoneOffset}
+
+Mihon.seeded(42L).today // 2026-01-01, on every run
 
 val clock = Clock.fixed(Instant.parse("2026-10-24T12:00:00Z"), ZoneOffset.UTC)
 val fixed = Mihon.seeded(42L, clock = clock)
 
 fixed.today       // 2026-10-24
 fixed.futureDate  // the same date on every run
+
+Mihon.seeded(42L, clock = Clock.systemUTC()).today // the real date, in UTC
 ```
 
 Views from `withLanguage` share one generator, so the order of calls across them is part of what
@@ -331,6 +337,20 @@ U.S. Census Bureau, and formats written for this library) are described in
 attributions. The scripts that build the data are in `scripts/data/`; the build never runs them.
 `make validate` checks every data file against its schema and holds the data, the JVM jar and the
 Scala.js output to a size budget.
+
+## Coming from Taihei Mihon 5.x
+
+Mihon 6.0.0 keeps Mihon's own API; what changes:
+
+- **Taihei Tsuji 6.0.0.** Mihon 6 depends on Taihei Tsuji 6, whose `Language` is the one Mihon's
+  API takes. Move Tsuji to 6.0.0 at the same time and follow its migration notes.
+- **Seeded dates repeat.** `Mihon.seeded` without a clock now uses a clock fixed at
+  `Mihon.SeededInstant` (2026-01-01T00:00:00Z) instead of `Clock.systemUTC()`, so `today`,
+  `yesterday`, `tomorrow`, `futureDate` and `pastDate` are the same on every run. They are
+  relative to 2026-01-01, so a `futureDate` may lie before the real date. For the old behaviour,
+  pass `clock = Clock.systemUTC()`. `Mihon.secure` is unchanged.
+- **Fewer transitive dependencies.** Mihon no longer brings ZIO or zio-json onto your classpath.
+  If your code used them without depending on them, add your own dependency.
 
 ## Coming from taihei-lorem 4.x
 

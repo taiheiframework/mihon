@@ -188,6 +188,19 @@ object MihonSpec extends ZIOSpecDefault:
           east.today == LocalDate.of(2026, 10, 25),
         )
       },
+      test("a seeded generator without a clock stands at SeededInstant, so its dates repeat") {
+        val one = Mihon.seeded(42L)
+        val two = Mihon.seeded(42L)
+        assertTrue(
+          Mihon.SeededInstant == Instant.parse("2026-01-01T00:00:00Z"),
+          one.today == LocalDate.of(2026, 1, 1),
+          one.yesterday == LocalDate.of(2025, 12, 31),
+          one.futureDate == LocalDate.of(2028, 7, 6),
+          one.pastDate == LocalDate.of(2011, 5, 12),
+          two.futureDate == LocalDate.of(2028, 7, 6),
+          two.pastDate == LocalDate.of(2011, 5, 12),
+        )
+      },
       test("future and past dates are one to a thousand weeks from today") {
         val today = LocalDate.of(2026, 10, 24)
         val weeks = many(500)(

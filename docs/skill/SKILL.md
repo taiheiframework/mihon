@@ -39,8 +39,10 @@ mihon.address.lines    // in the default country's format
 mihon.withLanguage(Language("la")).sentence // same generator and clock, other data
 ```
 
-Both factories take `language` (English by default) and then a `java.time.Clock`
-(`Clock.systemUTC()`); `today`, `yesterday`, `tomorrow`, `futureDate` and `pastDate` follow it.
+Both factories take `language` (English by default) and then a `java.time.Clock`;
+`today`, `yesterday`, `tomorrow`, `futureDate` and `pastDate` follow it. `secure` uses
+`Clock.systemUTC()`; `seeded` uses a clock fixed at `Mihon.SeededInstant` (2026-01-01T00:00:00Z),
+so a seed's dates repeat too. Pass `clock = Clock.systemUTC()` for dates relative to the real day.
 
 ## Reference index
 
