@@ -122,9 +122,11 @@ private[mihon] object LanguageData:
   private[data] def read[A : JsonValueCodec](file: String): A =
     parse[A](s"$root/$file", ResourceLoader.load(s"$root/$file"))
 
-  // The decoding of one file's text, named by its path in any error.
+  // The decoding of one file's text, named by its path in any error. Reentrant, with a reader of
+  // its own: a file is read on first use, which may be inside a caller's jsoniter decode on this
+  // thread, and readFromString would reuse that decode's pooled reader. Each file is read once.
   private[mihon] def parse[A : JsonValueCodec](path: String, json: String): A =
-    try readFromString[A](json, config)
+    try readFromStringReentrant[A](json, config)
     catch
       case e: JsonReaderException => throw new IllegalStateException(s"$path: ${e.getMessage}", e)
 

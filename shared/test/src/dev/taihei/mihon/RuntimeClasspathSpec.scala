@@ -5,7 +5,8 @@ import zio.test.*
 // What a user's build puts on the classpath for the published artifact (RuntimeModules, resolved
 // by the build from the artifact's POM with Coursier, on the JVM and on Scala.js): no ZIO module,
 // so a user who does not use ZIO gets none through Mihon, and jsoniter-scala-core at exactly the
-// version Mihon declares, which is Tsuji's, so neither is evicted by the other.
+// version Mihon declares, and any Tsuji that brings jsoniter-scala-core brings that version too
+// (Tsuji 6's pin; Tsuji 5 has none), so neither is evicted by the other.
 object RuntimeClasspathSpec extends ZIOSpecDefault:
 
   private def jsoniter(modules: List[(String, String, String)]) = modules.collect {

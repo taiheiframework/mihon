@@ -157,6 +157,29 @@ object FilesSpec extends ZIOSpecDefault:
         failure.failed.toOption.exists(e => !e.getMessage.contains("+----------+")),
       )
     },
+    // A data file is read lazily, on first use, so it may be read while a caller's own jsoniter
+    // decode is under way on the same thread, from a codec that calls Mihon.
+    test("reading a data file inside a caller's jsoniter decode leaves that decode intact") {
+      var inner   = Option.empty[Files.CountriesFile]
+      val outer   = new JsonValueCodec[List[String]]:
+        def decodeValue(in: JsonReader, default: List[String]): List[String] =
+          if !in.isNextToken('[') then in.decodeError("expected '['")
+          val first  = in.readString(null)
+          inner = Some(LanguageData.parse[Files.CountriesFile]("/countries.json", """ [["BE","België"]] """))
+          if !in.isNextToken(',') then in.decodeError("expected ','")
+          val second = in.readString(null)
+          if !in.isNextToken(']') then in.decodeError("expected ']'")
+          List(first, second)
+        def encodeValue(x: List[String], out: JsonWriter): Unit              = out.encodeError("not written")
+        def nullValue: List[String]                                          = Nil
+      val outcome = Try(readFromString[List[String]]("""["first","second"]""")(
+        using outer
+      ))
+      assertTrue(
+        outcome.toOption == Some(List("first", "second")),
+        inner == Some(List("BE" -> "België")),
+      )
+    },
     test("every data file of every language decodes") {
       val all = LanguageData.all
       assertTrue(
