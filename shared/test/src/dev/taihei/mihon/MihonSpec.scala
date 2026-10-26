@@ -193,7 +193,10 @@ object MihonSpec extends ZIOSpecDefault:
         val two = Mihon.seeded(42L)
         assertTrue(
           Mihon.SeededInstant == Instant.parse("2026-01-01T00:00:00Z"),
+          Mihon.SeededInstant == Instant.ofEpochSecond(1_767_225_600L),
           one.today == LocalDate.of(2026, 1, 1),
+          Mihon.seeded(42L).futureDate ==
+          Mihon.seeded(42L, clock = Clock.fixed(Mihon.SeededInstant, ZoneOffset.UTC)).futureDate,
           one.yesterday == LocalDate.of(2025, 12, 31),
           one.futureDate == LocalDate.of(2028, 7, 6),
           one.pastDate == LocalDate.of(2011, 5, 12),

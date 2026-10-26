@@ -8,6 +8,10 @@ import zio.test.*
 // version Mihon declares, which is Tsuji's, so neither is evicted by the other.
 object RuntimeClasspathSpec extends ZIOSpecDefault:
 
+  private def jsoniter(modules: List[(String, String, String)]) = modules.collect {
+    case ("com.github.plokhotnyuk.jsoniter-scala", name, version) if name.startsWith("jsoniter-scala-core_") => version
+  }
+
   private def zio(modules: List[(String, String, String)]) = modules.filter(_._1 == "dev.zio").toSet
 
   // TEMPORARY, until the pin on Taihei Tsuji 6.0.0. Tsuji 5 depends on zio-json, which brings ZIO,
@@ -31,15 +35,18 @@ object RuntimeClasspathSpec extends ZIOSpecDefault:
       assertTrue(
         RuntimeModules.declaredTsuji.startsWith("5."),
         zio(RuntimeModules.withoutTsuji).isEmpty,
-        (zio(RuntimeModules.all) -- throughTsuji5).isEmpty,
+        // the allowance is still needed: Tsuji 5 does bring ZIO
+        throughTsuji5.nonEmpty,
       )
     },
-    test("jsoniter-scala-core resolves to exactly the version Mihon declares") {
-      val resolved = RuntimeModules.all.collect {
-        case ("com.github.plokhotnyuk.jsoniter-scala", name, version) if name.startsWith("jsoniter-scala-core_") =>
-          version
-      }
-      assertTrue(resolved == List(RuntimeModules.declaredJsoniterScala))
+    // Coursier keeps the highest version, so the resolved one alone would not show a Tsuji that
+    // pins a lower one: what Tsuji brings on its own is checked too.
+    test("jsoniter-scala-core resolves to exactly the version Mihon declares, and Tsuji brings no other") {
+      assertTrue(
+        jsoniter(RuntimeModules.all) == List(RuntimeModules.declaredJsoniterScala),
+        jsoniter(RuntimeModules.tsujiAlone).forall(_ == RuntimeModules.declaredJsoniterScala),
+        RuntimeModules.tsujiAlone.exists(_._2.startsWith("taihei-tsuji_")),
+      )
     },
   )
 

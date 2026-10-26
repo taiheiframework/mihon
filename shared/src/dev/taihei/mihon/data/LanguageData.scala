@@ -120,10 +120,13 @@ private[mihon] object LanguageData:
   // Throws on a missing or malformed file: the build checks every file, so this is a packaging
   // bug to fix, not an input to handle.
   private[data] def read[A : JsonValueCodec](file: String): A =
-    try readFromString[A](ResourceLoader.load(s"$root/$file"), config)
+    parse[A](s"$root/$file", ResourceLoader.load(s"$root/$file"))
+
+  // The decoding of one file's text, named by its path in any error.
+  private[mihon] def parse[A : JsonValueCodec](path: String, json: String): A =
+    try readFromString[A](json, config)
     catch
-      case e: JsonReaderException =>
-        throw new IllegalStateException(s"$root/$file: ${e.getMessage}", e)
+      case e: JsonReaderException => throw new IllegalStateException(s"$path: ${e.getMessage}", e)
 
   // jsoniter's defaults but no hex dump of the file in an error: the path and offset say enough.
   private val config = ReaderConfig.withAppendHexDumpToParseException(false)

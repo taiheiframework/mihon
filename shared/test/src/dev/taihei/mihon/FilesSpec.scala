@@ -144,6 +144,19 @@ object FilesSpec extends ZIOSpecDefault:
         refused[Files.CountriesFile](""),
       )
     },
+    test("a malformed file is a packaging error naming its path, without a dump of the file") {
+      val path    = "/dev/taihei/mihon/data/xx/countries.json"
+      val failure = Try(LanguageData.parse[Files.CountriesFile](path, """[["BE","België"],"""))
+      assertTrue(
+        LanguageData.parse[Files.CountriesFile](path, """[["BE","België"]]""") == List("BE" -> "België"),
+        failure.failed.toOption.exists(_.isInstanceOf[IllegalStateException]),
+        failure.failed.toOption.exists(_.getMessage.startsWith(s"$path: ")),
+        // jsoniter's default config does dump the input, so the check below can tell
+        Try(readFromString[Files.CountriesFile]("""[["BE","België"],""")).failed.toOption
+          .exists(_.getMessage.contains("+----------+")),
+        failure.failed.toOption.exists(e => !e.getMessage.contains("+----------+")),
+      )
+    },
     test("every data file of every language decodes") {
       val all = LanguageData.all
       assertTrue(

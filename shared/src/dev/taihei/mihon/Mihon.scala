@@ -385,12 +385,23 @@ end Mihon
 /** Creates [[Mihon]] generators and tells which languages they serve. */
 object Mihon:
 
+  // 2026-01-01T00:00:00Z as seconds since the epoch. Lazy, and not parsed: once an Instant
+  // exists, Scala.js links its formatting (Instant.toString) into the bundle, which a program that
+  // never asks for a date should not pay for. MihonSpec checks the value.
   /**
    * The instant a [[seeded]] generator's clock stands at unless it is given another: midnight
    * at the start of 1 January 2026, UTC. It never changes within a major version, because every
    * seeded date depends on it.
    */
-  val SeededInstant: Instant = Instant.parse("2026-01-01T00:00:00Z")
+  lazy val SeededInstant: Instant = Instant.ofEpochSecond(1_767_225_600L)
+
+  // seeded's default clock: Clock.fixed(SeededInstant, ZoneOffset.UTC), except that it creates
+  // no Instant until a date is asked for, for the reason above.
+  private object SeededClock extends Clock:
+    def getZone: ZoneId                        = ZoneOffset.UTC
+    override def withZone(zone: ZoneId): Clock = Clock.fixed(SeededInstant, zone)
+    def instant(): Instant                     = SeededInstant
+    override def toString: String              = "SeededClock[2026-01-01T00:00:00Z,Z]"
 
   /**
    * A generator whose values repeat. The same seed, language, clock and Mihon version give the
@@ -426,7 +437,7 @@ object Mihon:
   def seeded(
     seed: Long,
     language: Language = Language.English,
-    clock: Clock = Clock.fixed(SeededInstant, ZoneOffset.UTC),
+    clock: Clock = SeededClock,
   ): Mihon =
     new Mihon(new Random(seed), clock, dataFor(language))
 
