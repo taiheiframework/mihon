@@ -41,7 +41,7 @@ Taihei Mihon 5.0.0.
 
 - Mill 1.3.1
 - Scala 3.9.0 (LTS) · Scala.js 1.22.0
-- ZIO 2.1.27 (`zio-json` 1.1, `zio-test`)
+- jsoniter-scala-core 2.42 (reads the bundled data) · ZIO 2.1.27 (`zio-test`, in the tests only)
 - `dev.taihei::taihei-tsuji` 5.0.0 · scala-java-time 2.8 and scalajs-java-securerandom (JS)
 
 The build resolves from Coursier's defaults (the local Ivy repository, then Maven Central), then
@@ -386,8 +386,8 @@ keep their 4.x shape; `id` and `today` changed as the table says.
 taihei-lorem 4.x in the packages `com.edoframework.lorem` and `genius.lorem`. Replace either
 package with `dev.taihei.mihon` in your imports (and `genius.i18n` or `com.edoframework.i18n`
 with `dev.taihei.tsuji`), then follow [Coming from taihei-lorem 4.x](#coming-from-taihei-lorem-4x).
-genius-lorem 2.0.0 was on an earlier Scala: Taihei Mihon needs Scala 3.9 or later, `zio-json`
-1.1, and is under the Apache License 2.0.
+genius-lorem 2.0.0 was on an earlier Scala: Taihei Mihon needs Scala 3.9 or later and is under
+the Apache License 2.0.
 
 ## License
 

@@ -1,10 +1,10 @@
 package dev.taihei.mihon.data
 
-import zio.json.*
-
 import dev.taihei.mihon.data.Files.given
 import dev.taihei.mihon.sources.ResourceLoader
 import dev.taihei.tsuji.Language
+
+import com.github.plokhotnyuk.jsoniter_scala.core.*
 
 // A name in one form: its own script, romanised, in ASCII, and its reading where the language
 // has one (Japanese kana).
@@ -119,10 +119,14 @@ private[mihon] object LanguageData:
 
   // Throws on a missing or malformed file: the build checks every file, so this is a packaging
   // bug to fix, not an input to handle.
-  private[data] def read[A : JsonDecoder](file: String): A =
-    ResourceLoader.load(s"$root/$file").fromJson[A] match
-      case Right(a)    => a
-      case Left(error) => throw new IllegalStateException(s"$root/$file: $error")
+  private[data] def read[A : JsonValueCodec](file: String): A =
+    try readFromString[A](ResourceLoader.load(s"$root/$file"), config)
+    catch
+      case e: JsonReaderException =>
+        throw new IllegalStateException(s"$root/$file: ${e.getMessage}", e)
+
+  // jsoniter's defaults but no hex dump of the file in an error: the path and offset say enough.
+  private val config = ReaderConfig.withAppendHexDumpToParseException(false)
 
   private lazy val catalog: LanguagesFile = read[LanguagesFile]("languages.json")
 
