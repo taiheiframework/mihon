@@ -6,4 +6,9 @@ package dev.taihei.mihon
  * [[Person]] has. Where a culture has unisex names, such a name is on both lists.
  */
 enum Gender:
-  case Female, Male
+
+  /** The female given names, and the female form of a gendered family name (Иванова). */
+  case Female
+
+  /** The male given names, and the male form of a gendered family name (Иванов). */
+  case Male
