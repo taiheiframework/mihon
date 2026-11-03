@@ -21,7 +21,7 @@ object V {
   val scalaJS             = "1.22.0"
   val zio                 = "2.1.27"
   // The version Taihei Tsuji 6 moves to (Tsuji 5 has no jsoniter-scala). At release-prepare it
-  // must equal Tsuji 6.0.0's pin (ADR 0006, J2); RuntimeClasspathSpec fails when the Tsuji that
+  // must equal Tsuji 6.0.0's pin (ADR 0006); RuntimeClasspathSpec fails when the Tsuji that
   // Mihon pins brings another version, higher or lower.
   val jsoniterScala       = "2.42.0" // com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-core (MIT)
   val scalaJavaTime       = "2.8.0"
