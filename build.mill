@@ -20,13 +20,12 @@ object V {
   val scala               = "3.9.0"
   val scalaJS             = "1.22.0"
   val zio                 = "2.1.27"
-  // The version Taihei Tsuji 6 moves to (Tsuji 5 has no jsoniter-scala). At release-prepare it
-  // must equal Tsuji 6.0.0's pin (ADR 0006); RuntimeClasspathSpec fails when the Tsuji that
+  // The same version Taihei Tsuji pins (ADR 0006): RuntimeClasspathSpec fails when the Tsuji that
   // Mihon pins brings another version, higher or lower.
   val jsoniterScala       = "2.42.0" // com.github.plokhotnyuk.jsoniter-scala::jsoniter-scala-core (MIT)
   val scalaJavaTime       = "2.8.0"
   val scalaJsSecureRandom = "1.0.0"
-  val taiheiTsuji         = "5.0.0" // dev.taihei::taihei-tsuji (Language)
+  val taiheiTsuji         = "6.0.0" // dev.taihei::taihei-tsuji (Language)
 }
 
 // ---------------------------------------------------------------------------
@@ -161,11 +160,15 @@ trait TaiheiRuntimeModules extends PublishModule {
       )
       coursier.core.Dependency(module, coursier.version.VersionConstraint(d.artifact.version))
     }
+    // minDependencies keeps one entry per configuration a module is reached through, so a module
+    // that comes both directly and through Tsuji is listed more than once; one module at one
+    // version is one entry, and two versions of a module stay two.
     resolver
       .resolution(coursierDeps)
       .minDependencies
       .toSeq
       .map(d => (d.module.organization.value, d.module.name.value, d.versionConstraint.asString))
+      .distinct
       .sorted
   }
 
@@ -194,7 +197,6 @@ trait TaiheiRuntimeModules extends PublishModule {
           |// The published artifact's runtime classpath, resolved from its POM: (organisation, name, version).
           |object RuntimeModules:
           |  val declaredJsoniterScala: String = ${literal(V.jsoniterScala)}
-          |  val declaredTsuji: String = ${literal(V.taiheiTsuji)}
           |
           |  val all: List[(String, String, String)] = List(
           |${lines(all)}

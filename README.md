@@ -20,10 +20,10 @@ to the Taihei Framework's own Maven repository.
 | `taihei-mihon_sjs1` | Scala.js | Language data compiled in; runs in the browser or Node. |
 
 ```scala
-mvn"dev.taihei::taihei-mihon:5.0.0"       // Mill, JVM
-mvn"dev.taihei::taihei-mihon::5.0.0"      // Mill, Scala.js
-"dev.taihei" %% "taihei-mihon" % "5.0.0"  // sbt, JVM
-"dev.taihei" %%% "taihei-mihon" % "5.0.0" // sbt, Scala.js (sbt-scalajs or sbt-crossproject)
+mvn"dev.taihei::taihei-mihon:6.0.0"       // Mill, JVM
+mvn"dev.taihei::taihei-mihon::6.0.0"      // Mill, Scala.js
+"dev.taihei" %% "taihei-mihon" % "6.0.0"  // sbt, JVM
+"dev.taihei" %%% "taihei-mihon" % "6.0.0" // sbt, Scala.js (sbt-scalajs or sbt-crossproject)
 ```
 
 `shared/` holds the generator and, in `shared/resources/`, the language data; `jvm/` and `js/`
@@ -43,7 +43,7 @@ Taihei Mihon 5.0.0.
 - Mill 1.3.1
 - Scala 3.9.0 (LTS) · Scala.js 1.22.0
 - jsoniter-scala-core 2.42 (reads the bundled data) · ZIO 2.1.27 (`zio-test`, in the tests only)
-- `dev.taihei::taihei-tsuji` 5.0.0 · scala-java-time 2.8 and scalajs-java-securerandom (JS)
+- `dev.taihei::taihei-tsuji` 6.0.0 · scala-java-time 2.8 and scalajs-java-securerandom (JS)
 
 The build resolves from Coursier's defaults (the local Ivy repository, then Maven Central), then
 from the family's Maven repository (`REPO_URL` in the Makefile, built from the immutable GitHub
