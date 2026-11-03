@@ -55,7 +55,8 @@ make compile        # ./mill __.compile           (JVM + JS)
 make test           # ./mill __.test.testForked    (JVM + JS; JS runs on Node)
 make fmt            # ./mill __.reformat
 make fix            # ./mill __.fix                 (scalafix)
-make validate       # repo-guard + release-test + data-check-test + fix + fmt + compile + test + mima + budget
+make lint           # ./mill __.checkFormat and __.fix --check, as CI checks them
+make validate       # repo-guard + release-test + data-check-test + fix + fmt + lint + compile + test + mima + budget
 make budget         # the size budget of the data, the JVM jar and the Scala.js output
 make repo-guard     # Coursier's defaults (local Ivy, Central), then REPO_URL for dev.taihei
                     # alone, nothing else; every resolved dev.taihei file checked
