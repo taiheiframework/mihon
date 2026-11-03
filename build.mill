@@ -161,8 +161,9 @@ trait TaiheiRuntimeModules extends PublishModule {
       coursier.core.Dependency(module, coursier.version.VersionConstraint(d.artifact.version))
     }
     // minDependencies keeps one entry per configuration a module is reached through, so a module
-    // that comes both directly and through Tsuji is listed more than once; one module at one
-    // version is one entry, and two versions of a module stay two.
+    // that comes both directly and through Tsuji is listed more than once; distinct makes one
+    // module at one version one entry. One resolution holds one version per module, so a second
+    // version of a module that Tsuji brings shows in the tsujiAlone resolution, not here.
     resolver
       .resolution(coursierDeps)
       .minDependencies
