@@ -66,8 +66,8 @@ object release extends Module {
   val majorLine = "6.0.0"
 
   // The family's Maven repository, the one repository this build adds to Coursier's defaults
-  // (Maven Central), after them. It serves the libraries' immutable GitHub Releases, so a version
-  // is usable before the release train takes it to Central. The Makefile's REPO_URL holds the
+  // (Maven Central), after them. It serves the libraries' immutable GitHub Releases, and so every
+  // version from 6.0.0 on, which Maven Central does not get. The Makefile's REPO_URL holds the
   // same string, and repo-guard checks that they agree. Moving the site to another address
   // changes both lines.
   val repoUrl = "https://taiheiframework.github.io/repo/"
