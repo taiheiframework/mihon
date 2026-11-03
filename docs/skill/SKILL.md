@@ -10,9 +10,10 @@ languages. One class, `Mihon`, bound to one language, with a flat catalog of gen
 text, people, places, dates, files and ids; the values `Person` and `Address`; the enum
 `Gender`; and `SampleImages`.
 
-The package is `dev.taihei.mihon`. Artifacts on Maven Central: `dev.taihei::taihei-mihon`,
-published as `taihei-mihon_3` (JVM) and `taihei-mihon_sjs1_3` (Scala.js), from 5.0.0, compiled
-with Scala 3.9 (LTS), Apache 2.0. It depends on `dev.taihei::taihei-tsuji` 5 for `Language`.
+The package is `dev.taihei.mihon`. Artifacts: `dev.taihei::taihei-mihon`, published as
+`taihei-mihon_3` (JVM) and `taihei-mihon_sjs1_3` (Scala.js), from 5.0.0 (on Maven Central; 6.0.0
+is not, it is published to the Taihei Framework's own Maven repository), compiled with Scala 3.9
+(LTS), Apache 2.0. It depends on `dev.taihei::taihei-tsuji` 5 for `Language`.
 Source: <https://github.com/taiheiframework/mihon>. Up to 4.x it was `dev.taihei::taihei-lorem`
 in package `dev.taihei.lorem`, with `LoremIpsum` as an object.
 

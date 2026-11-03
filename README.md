@@ -11,7 +11,8 @@ taihei-lorem: see [Coming from taihei-lorem 4.x](#coming-from-taihei-lorem-4x).
 
 ## Modules
 
-Published on Maven Central under `dev.taihei`:
+Published under `dev.taihei`. Version 5.0.0 is on Maven Central; 6.0.0 is not, it is published
+to the Taihei Framework's own Maven repository.
 
 | Artifact            | Platform | Notes                                                  |
 | ------------------- | -------- | ------------------------------------------------------ |
@@ -100,10 +101,10 @@ repo1.maven.org answers 200 for it, push `main` and the tag; once its advisory i
 A release is built and signed once, as one bundle. Its zip and `SHA256SUMS`, the SHA-256 of
 every file, are kept on an immutable GitHub Release of the tag; that release publishes the
 version. The family's Maven repository is built from those releases alone, so nothing is ever
-uploaded to it, and the next release train takes the same files to Maven Central. Both serve
-exactly the bytes `SHA256SUMS` lists. A security fix goes to Central first (`EMBARGO=1`), and
-gets its GitHub Release, from Central's own files (`make central-bundle`), only after its
-advisory is published.
+uploaded to it, and it serves exactly the bytes `SHA256SUMS` lists. No new version goes to Maven
+Central, apart from a security fix for a line whose users are on Central: it goes to Central
+first (`EMBARGO=1`), and gets its GitHub Release, from Central's own files
+(`make central-bundle`), only after its advisory is published.
 
 `make validate` checks the build's repositories (`repo-guard`): Coursier's defaults (the local
 Ivy repository, then Maven Central), then `REPO_URL` for `dev.taihei` alone, and nothing else,
@@ -116,8 +117,8 @@ good signature by that key.
 repo-guard asks the GitHub API without a token: when the API answers HTTP 403 or 429 (its limit
 for anonymous requests), wait an hour and run it again. When it names a file other than
 `dev.taihei` in the Coursier cache of `REPO_URL`, remove that repository's directory from the
-cache (`~/.cache/coursier/v1/https/taiheiframework.github.io/repo/` on Linux,
-`~/Library/Caches/Coursier/v1/https/taiheiframework.github.io/repo/` on macOS) and build again.
+cache (under `~/.cache/coursier/v1/https/` on Linux, `~/Library/Caches/Coursier/v1/https/` on
+macOS, the directory named after `REPO_URL`'s host and path) and build again.
 
 A release publishes only the commit `release-prepare` validated, and refuses when a file git
 does not track is in a source or resource folder, or a stray build file is in the tree.

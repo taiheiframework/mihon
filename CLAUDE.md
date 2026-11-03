@@ -26,7 +26,8 @@ make publish-repo      # the family repository's deploy, then verify-repo reads 
 Releases follow ADR 0004: one signed bundle, built locally by release-finalize (nothing is
 uploaded), then main and the tag are pushed, release-github keeps it on an immutable GitHub
 Release, the family's Maven repository (`REPO_URL`, the same string as `release.repoUrl` in
-build.mill) serves it from there, and the next release train in nakama takes it to Maven Central.
+build.mill) serves it from there. Maven Central is frozen: no new version goes there, apart from a
+security fix for a line whose users are on Central.
 A security fix (`EMBARGO=1`) goes to Central first with `make publish`, and gets its GitHub
 Release from Central's files (`make central-bundle`) after its advisory. The machinery is shared
 with tsuji: keep everything but the per-library lines identical. Credentials never go on make's
@@ -61,7 +62,7 @@ command line; never read or print `~/.edo-release.env`.
   `private[mihon]`. It follows semantic versioning; a break is a major release with a migration
   section in the README.
 - Every dependency comes from Maven Central under an Apache-compatible licence (a dev.taihei
-  version not on Central yet from `REPO_URL`); the build needs no credentials. taihei-tsuji is
+  version that is not on Central from `REPO_URL`); the build needs no credentials. taihei-tsuji is
   pinned in `V.taiheiTsuji` and released first.
 - Data is generic (common names, real cities, words, MIME types), every piece from a source named
   in `docs/data-sources.md` under an Apache-compatible licence: nothing taken from a client or a
