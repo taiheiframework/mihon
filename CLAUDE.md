@@ -15,6 +15,7 @@ make repo-guard        # Coursier's defaults (local Ivy, Central), then REPO_URL
 make mima              # against the newest tag of release.majorLine (none yet on 6.x), on Central or REPO_URL
                        # (between a tag push and publish-repo it fails; MIMA_BASELINE=x.y.z)
 make test              # ./mill __.test.testForked (JS tests run under Node)
+TAIHEI_TEST_JAVA_HOME=<a JDK 17> ./mill mihon.jvm.test.testForked   # the JVM tests on Java 17
 make publish-dry-run   # the bundle Maven Central would receive, written to out/
 make release-prepare TYPE=patch|minor|major EMBARGO=0|1   # then review RELEASE_x_y_z.md;
                        # EMBARGO=1 when the ticket has the label embargo (read it with fude first)
@@ -31,7 +32,8 @@ security fix for a line whose users are on Central.
 A security fix (`EMBARGO=1`) goes to Central first with `make publish`, and gets its GitHub
 Release from Central's files (`make central-bundle`) after its advisory. The machinery is shared
 with tsuji: keep everything but the per-library lines identical. Credentials never go on make's
-command line; never read or print `~/.edo-release.env`.
+command line and are not exported in the shell you build in; never read or print
+`~/.edo-release.env`.
 
 ## Layout
 
@@ -55,6 +57,8 @@ command line; never read or print `~/.edo-release.env`.
 ## Rules
 
 - Whatever is in `shared/` compiles on Scala.js: no JVM-only API there.
+- Java 17 is the JVM floor: the JVM modules compile with `-java-output-version:17`, and CI runs
+  the JVM tests on Java 17 too.
 - No global generator and no wall clock: every draw goes through the instance's `Random`, using
   only `nextInt`, `nextInt(n)`, `nextLong`, `nextBoolean` and `nextDouble`, so a seed gives the
   same values on both platforms.

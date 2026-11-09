@@ -40,6 +40,8 @@ Taihei Mihon 5.0.0.
 
 ## Stack
 
+- JVM: Java 17 or later. The JVM modules are compiled against the Java 17 API
+  (`-java-output-version:17`), and CI runs the tests on Java 17 and on Java 25.
 - Mill 1.3.1
 - Scala 3.9.0 (LTS) · Scala.js 1.22.0
 - jsoniter-scala-core 2.42 (reads the bundled data) · ZIO 2.1.27 (`zio-test`, in the tests only)
@@ -48,6 +50,10 @@ Taihei Mihon 5.0.0.
 The build resolves from Coursier's defaults (the local Ivy repository, then Maven Central), then
 from the family's Maven repository (`REPO_URL` in the Makefile, built from the immutable GitHub
 Releases) for `dev.taihei` alone, and from nothing else; none of them needs credentials.
+
+Coursier asks the local Ivy repository first, so a `publishLocal` copy of a `dev.taihei` version
+the build resolves is found before Maven Central and `REPO_URL`, and repo-guard refuses it ("not
+in the Coursier cache"). Remove it from `~/.ivy2/local/dev.taihei/` before `make validate`.
 
 ## Build
 
@@ -129,24 +135,24 @@ get them; do not export them in the shell you build in, where every Mill call of
 and of `release-prepare` would see them (repo-guard, `release-preflight` and the dry run unset
 them first).
 
-`make publish` is only for a security fix under embargo, which goes to Central
-first; it refuses any other version, and a version whose Central upload it
-started before. It reads the Central Portal user token and
-the release key from `~/.edo-release.env` (a name from the Edo Framework days, kept because the
-maintainers' workstations write it for every library; `RELEASE_ENV=…` on the
-make command line points elsewhere, and the file must be yours, mode 600, not a
-link) or the environment (`MILL_SONATYPE_USERNAME`,
-`MILL_SONATYPE_PASSWORD`, `MILL_PGP_SECRET_BASE64`, `MILL_PGP_PASSPHRASE`).
-The dry run that builds the release bundle gets the release key but never the
-Central token, neither from that file nor from the shell. The `mill` launcher
-downloads Mill over HTTPS only, and runs Mill only when its SHA-256 matches the
-one pinned in the launcher: it checks a download before keeping it, and the
-file it is about to run before every run, so a tampered copy in Mill's cache is
-refused, as is a version without a pin. `release-preflight` (inside
-`release-finalize`), `release-github` and `publish-repo` use the maintainer's
-`gh` login; nothing else in a release needs a token.
-Releases are signed by the Taihei Framework release key,
-fingerprint `5026 B299 6DDB 697E C463  0BCF 14A7 33E2 A507 702F`.
+`make publish` is only for a security fix under embargo, which goes to Central first; it refuses
+any other version, and a version whose Central upload it started before. It reads the Central
+Portal user token and the release key from `~/.edo-release.env` (a name from the Edo Framework
+days, kept because the maintainers' workstations write it for every library; `RELEASE_ENV=…` on
+the make command line points elsewhere, and the file must be yours, mode 600, not a link) or the
+environment (`MILL_SONATYPE_USERNAME`, `MILL_SONATYPE_PASSWORD`, `MILL_PGP_SECRET_BASE64`,
+`MILL_PGP_PASSPHRASE`). The dry run that builds the release bundle gets the release key but never
+the Central token, neither from that file nor from the shell. The `mill` launcher downloads Mill
+over HTTPS only, and runs Mill only when its SHA-256 matches the one pinned in the launcher: it
+checks a download before keeping it, and the file it is about to run before every run, so a
+tampered copy in Mill's cache is refused, as is a version without a pin. `release-preflight`
+(inside `release-finalize`), `release-github` and `publish-repo` use the maintainer's `gh` login;
+nothing else in a release needs a token.
+Releases are signed by the Taihei Framework release key, fingerprint
+`5026 B299 6DDB 697E C463  0BCF 14A7 33E2 A507 702F`, with the user ids
+`Taihei Framework Releases <releases@taihei.dev>` and, from before the family was renamed,
+`Edo Framework Releases <releases@edoframework.com>`. The fingerprint is what to verify. The
+key is published on keyserver.ubuntu.com and keys.openpgp.org.
 
 ## Quick start
 
