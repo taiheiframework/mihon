@@ -31,8 +31,8 @@ object V {
 // ---------------------------------------------------------------------------
 // Version from git: an exact v-tag on a clean tree is the release, anything else
 // a SNAPSHOT of the last tag. Untracked files do not count. A Task.Input, so a
-// new commit, tag or edit is seen without restarting the Mill daemon. The
-// release itself is the Makefile's (release-prepare / release-finalize).
+// new commit, tag or edit is seen without restarting the Mill daemon. A
+// release is the maintainer's signed tag and the workflow it starts (release.yml).
 // ---------------------------------------------------------------------------
 object release extends Module {
   private def gitAt(root: os.Path, args: String*) = os.proc("git", args).call(cwd = root, check = false)
@@ -61,7 +61,7 @@ object release extends Module {
 
   // The first release of the major line main is on. MiMa compares only within a major line: a
   // major may break, so a release of the previous major is no baseline for it. Raise this when
-  // work on the next major starts on main; release-prepare TYPE=major still sets none.
+  // work on the next major starts on main; until then a major sets MIMA_BASELINE=none.
   val majorLine = "6.0.0"
 
   // The family's Maven repository, the one repository this build adds to Coursier's defaults
@@ -71,28 +71,25 @@ object release extends Module {
   // changes both lines.
   val repoUrl = "https://taiheiframework.github.io/repo/"
 
-  // Whether a version of this library is released, on Maven Central or on repoUrl, asked of its
-  // JVM module's POM by scripts/release.py (a file, not the version's directory, which the
-  // family's repository answers 404 for). A version on neither, or an answer that is neither 200
-  // nor 404 (a redirect included), fails the build: a baseline we cannot determine must not turn
-  // into no baseline, or into an older one.
-  private def released(root: os.Path, v: String): Unit = {
+  // Whether the tag v<v> has an immutable GitHub Release, asked of the GitHub API without a token
+  // by scripts/release.py. A tag without one is spent (its release run failed before it published
+  // anything) and is no baseline. Any answer but "an immutable release" or "none" fails the build:
+  // a baseline we cannot determine must not turn into no baseline, or into an older one.
+  private def immutableRelease(root: os.Path, v: String): Boolean = {
     val r = os
-      .proc("python3", "-I", "-B", root / "scripts" / "release.py", "released", "--central", "https://repo1.maven.org/maven2", "--url", repoUrl, "--artifact", "taihei-mihon_3", v)
+      .proc("python3", "-I", "-B", root / "scripts" / "release.py", "immutable", "--api", "https://api.github.com", "--repo", "taiheiframework/mihon", v)
       .call(check = false, stderr = os.Pipe)
     if (r.exitCode != 0) sys.error(s"no MiMa baseline: ${r.err.text().trim()}")
+    r.out.trim() == "immutable"
   }
 
   // The release MiMa compares with: the newest v-tag reachable from HEAD, none before
-  // firstRelease or majorLine, whose version must be on Maven Central or on the family's
-  // repository (repoUrl); MiMa resolves it through the same two. A tag on neither fails the build,
-  // naming it: a pushed tag is final and is published by release-github and publish-repo within
-  // minutes, so a tag the repository does not serve is something to look at, never a reason to
-  // compare with an older release unseen. Until it is served, MIMA_BASELINE names the release to
-  // compare with. On a release itself (an exact v-tag on a clean tree, as in CI on the
-  // tagged commit) that tag is HEAD's own, which would compare the release with itself; so there
-  // the search starts at the commit before it. MIMA_BASELINE overrides it: `none` for a major,
-  // which may break (release-prepare TYPE=major sets it), or a version.
+  // firstRelease or majorLine, that has an immutable GitHub Release. A tag without one is spent
+  // and skipped, so the next older tag is asked. MiMa resolves the baseline from Maven Central or
+  // the family's repository (repoUrl), and fails when neither serves it. On a release itself (an
+  // exact v-tag on a clean tree, as in the release workflow's build) that tag is HEAD's own, which
+  // would compare the release with itself; so there the search starts at the commit before it.
+  // MIMA_BASELINE overrides it: `none` for a major, which may break, or a version.
   def mimaBaseline = Task.Input {
     val root = os.Path(sys.env("MILL_WORKSPACE_ROOT"))
     def git(args: String*) = gitAt(root, args*)
@@ -120,10 +117,7 @@ object release extends Module {
           .map(_.trim.stripPrefix("v"))
           .filter(_.matches("[0-9]+\\.[0-9]+\\.[0-9]+"))
           .filter(v => atLeast(v, firstRelease) && atLeast(v, majorLine))
-        candidates.headOption.map { v =>
-          released(root, v)
-          v
-        }
+        candidates.find(v => immutableRelease(root, v))
     }
   }
 }

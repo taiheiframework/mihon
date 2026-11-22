@@ -95,6 +95,7 @@ scripts/data/                               the data scripts
   tests on Java 17 too.
 - LICENSE, NOTICE and LICENSE-UNICODE are in `META-INF/` of every published jar that carries
   code or data: the JVM and Scala.js jars and their sources jars. The javadoc jars hold neither.
-- Released from the git tag (`make release-prepare TYPE=…`, then `make release-finalize`), the
-  same as every Taihei Framework library. MiMa compares with the newest 5.x release; 5.0.0 is the
-  first under this name.
+- Released from the maintainer's signed git tag by the family's release workflow
+  (`.github/workflows/release.yml`), the same as every Taihei Framework library. MiMa compares
+  with the newest release of the current major that has an immutable GitHub Release; 5.0.0 is
+  the first under this name.
