@@ -71,10 +71,12 @@ object release extends Module {
   // changes both lines.
   val repoUrl = "https://taiheiframework.github.io/repo/"
 
-  // Whether the tag v<v> has an immutable GitHub Release, asked of the GitHub API without a token
-  // by scripts/release.py. A tag without one is spent (its release run failed before it published
-  // anything) and is no baseline. Any answer but "an immutable release" or "none" fails the build:
-  // a baseline we cannot determine must not turn into no baseline, or into an older one.
+  // Whether the tag v<v> has a published, immutable GitHub Release, asked of the GitHub API without
+  // a token by scripts/release.py. A tag without one (no release, a draft or a mutable one) is
+  // spent and is no baseline. An answer the script cannot read (an error, a rate limit, a
+  // redirect) fails the build instead of passing as "spent". A tag whose release run has not
+  // finished also has no release yet and would be skipped for an older baseline, so the next tag
+  // of a line is pushed only once the previous one is released or its run has failed.
   private def immutableRelease(root: os.Path, v: String): Boolean = {
     val r = os
       .proc("python3", "-I", "-B", root / "scripts" / "release.py", "immutable", "--api", "https://api.github.com", "--repo", "taiheiframework/mihon", v)

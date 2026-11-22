@@ -93,7 +93,9 @@ Only the maintainer releases, with two acts:
    puts its files in the family's Maven repository.
 
 A version is built and signed once. A run that fails before its GitHub Release is published
-spends the version: its tag stays, and the next release takes the next number. No new version of
+spends the version: its tag stays, and the next release takes the next number. The next tag of a
+line is pushed only once the previous one's GitHub Release is published or its run has failed:
+MiMa compares with the newest tag that has an immutable release, and skips one still in flight. No new version of
 this line goes to Maven Central (ADR 0009); a security fix for a line whose users are on Central
 goes there afterwards, from the same bytes. An embargoed fix is a tag that is not pushed yet.
 

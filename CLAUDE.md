@@ -24,8 +24,10 @@ Only the maintainer releases (ADR 0014): he signs and pushes a `v`-tag on the co
 its `RELEASE_x_y_z.md`, and `.github/workflows/release.yml` calls the family's release workflow,
 pinned to a full commit of `taiheiframework/release`, which runs `validate`, `test-java-17` and
 `publish-dry-run` from this Makefile and waits for his approval before it signs and publishes. An
-agent writes the notes through the merge gate and never creates or pushes a release tag. Moving
-the pin is a reviewed change. The family's Maven repository (`REPO_URL`, the same string as
+agent writes the notes through the merge gate and never creates or pushes a release tag. The
+next tag of a line waits until the previous one's GitHub Release is published or its run failed:
+MiMa skips a tag without an immutable release, an unfinished one included. Moving the pin is a
+reviewed change. The family's Maven repository (`REPO_URL`, the same string as
 `release.repoUrl` in build.mill) serves every release from its immutable GitHub Release. Maven
 Central is frozen: no version of this line goes there, except a security fix of a line whose users
 are on Central, from the same bytes. Credentials never go on make's command line and are not
