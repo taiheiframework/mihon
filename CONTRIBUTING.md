@@ -9,7 +9,8 @@ You need a JDK (CI uses 25) and Node.js (for the Scala.js tests). Everything res
 Central; no credentials are needed.
 
 ```sh
-make validate   # scalafix, scalafmt, compile, test and MiMa, on the JVM and Scala.js
+make fix && make fmt   # scalafix and scalafmt rewrite the sources
+make validate          # checks scalafix and scalafmt, compile, test and MiMa, on the JVM and Scala.js
 ```
 
 `make validate` must pass before a change is merged. A change that breaks binary compatibility

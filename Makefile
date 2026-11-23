@@ -50,9 +50,8 @@ fix:
 fmt:
 	./mill __.reformat
 
-# The checks CI runs, after fix and fmt have rewritten the sources: when scalafmt and scalafix
-# disagree on a line, the one that ran last wins locally and the other fails in CI, so validate
-# checks with both instead of trusting the rewrite.
+# What CI checks: fails on a file scalafmt or scalafix would change, and changes nothing. Both
+# check, since where they disagree on a line the one that ran last wins a rewrite.
 lint:
 	./mill __.checkFormat
 	./mill __.fix --check
@@ -160,7 +159,9 @@ budget:
 data-check-test:
 	@bash scripts/test-data-check.sh
 
-validate: repo-guard release-test data-check-test fix fmt lint compile test mima budget
+# Checks and never rewrites: run make fix and make fmt first, so unformatted code fails here
+# and in the release run instead of passing reformatted.
+validate: repo-guard release-test data-check-test lint compile test mima budget
 
 # The JVM tests on Java 17, the oldest Java the library supports (scalac already compiles against
 # its API). Mill runs on its own JVM, so TAIHEI_TEST_JAVA_HOME, a JDK 17's home, makes the test

@@ -8,7 +8,8 @@ from the parent folder's `CLAUDE.md` when this repo is checked out under `~/Proj
 ## Commands
 
 ```bash
-make validate          # repo-guard, release and data-check tests, scalafix, scalafmt, both checked as CI does, compile, test, MiMa and budget, JVM and JS
+make fix && make fmt   # scalafix, scalafmt: rewrite the sources
+make validate          # repo-guard, release and data-check tests, check scalafmt and scalafix, compile, test, MiMa and budget, JVM and JS
 make budget            # size budget: data per language and in all, JVM jar, Scala.js fixture
 make repo-guard        # Coursier's defaults (local Ivy, Central), then REPO_URL for dev.taihei alone;
                        # pins released; resolved dev.taihei files checked
