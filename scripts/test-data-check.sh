@@ -27,7 +27,9 @@ refuses() { # name, expected message, setup...
 }
 
 accepts
-refuses "a symlink to a file outside" "a link, or a folder above it" ln -s /etc/hostname "$T/r/$D/en/x.json"
+# The target is a file the test makes itself: a system file such as /etc/hostname is missing on
+# macOS, and a dangling link fails the check with another message.
+refuses "a symlink to a file outside" "a link, or a folder above it" bash -c "echo '{}' > '$T/outside.json' && ln -s '$T/outside.json' '$T/r/$D/en/x.json'"
 refuses "a symlinked data file" "a link" bash -c "mv '$T/r/$D/en/text.json' '$T/text.json' && ln -s '$T/text.json' '$T/r/$D/en/text.json'"
 refuses "a symlinked language folder" "a link, or a folder above it" bash -c "mv '$T/r/$D/la' '$T/la' && ln -s '$T/la' '$T/r/$D/la'"
 refuses "a symlinked data folder" "a link, or a folder above it" bash -c "mv '$T/r/$D' '$T/data' && ln -s '$T/data' '$T/r/$D'"
