@@ -86,11 +86,9 @@ jobs:
       - name: Data check tests
         run: make data-check-test
 
-      - name: Check formatting
-        run: ./mill __.checkFormat
-
-      - name: Check linting (scalafix)
-        run: ./mill __.fix --check
+      # Formatting and scalafix, checked only, as make validate does.
+      - name: Check formatting and linting (scalafmt, scalafix)
+        run: make lint
 
       - name: Compile all modules (JVM + JS)
         run: ./mill __.compile

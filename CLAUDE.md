@@ -16,7 +16,7 @@ make repo-guard        # Coursier's defaults (local Ivy, Central), then REPO_URL
 make mima              # against the newest tag of release.majorLine that has an immutable GitHub
                        # Release (a tag without one is spent); MIMA_BASELINE=none for a major
 make test              # ./mill __.test.testForked (JS tests run under Node)
-make lint              # ./mill __.checkFormat, then __.fix --check: CI's lint steps
+make lint              # ./mill __.checkFormat, then __.fix --check: CI's lint step
 TAIHEI_TEST_JAVA_HOME=<a JDK 17> make test-java-17   # the JVM tests on Java 17
 make publish-dry-run   # the signed bundle, written to out/ (key from MILL_PGP_SECRET_BASE64)
 ```
