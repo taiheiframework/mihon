@@ -9,9 +9,8 @@ on:
       - main
   workflow_dispatch:
 
-# Read-only: CI builds and tests, it publishes nothing.
-permissions:
-  contents: read
+# No permission by default: each job names what it needs, so a job added later starts with none.
+permissions: {}
 
 env:
   JAVA_VERSION: '25'
@@ -23,6 +22,9 @@ jobs:
   validate:
     name: Validate (Format, Lint, Compile, Test, MiMa, JVM & JS)
     runs-on: ubuntu-latest
+    # Read-only: CI builds and tests, it publishes nothing.
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -111,6 +113,8 @@ jobs:
   test-java-17:
     name: JVM tests on Java 17
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
