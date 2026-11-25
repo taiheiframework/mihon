@@ -88,6 +88,10 @@ jobs:
       - name: Data check tests
         run: make data-check-test
 
+      # Every public declaration has a Scaladoc, after the check's own tests.
+      - name: Scaladoc on every public declaration
+        run: make scaladoc
+
       # Formatting and scalafix, checked only, as make validate does.
       - name: Check formatting and linting (scalafmt, scalafix)
         run: make lint

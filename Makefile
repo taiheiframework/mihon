@@ -34,7 +34,7 @@ BUILD_FILES = '*.mill' '*.mill.yaml' '*.mill.scala' '*.sc' mill-build .mill-vers
 # (a redirect is an answer that stops a check), 000 when there is no answer.
 HTTP_CODE = { curl -q -s --proto '=https' --max-time 30 -o /dev/null -w '%{http_code}' "$$URL" || true; }
 
-.PHONY: clean fix fmt lint compile prepare build test test-java-17 mima budget data-check-test repo-guard release-test validate \
+.PHONY: clean fix fmt lint compile prepare build test test-java-17 mima budget data-check-test scaladoc repo-guard release-test validate \
         deps publishLocal publish-dry-run
 
 # ---------------------------------------------------------------------------
@@ -159,9 +159,15 @@ budget:
 data-check-test:
 	@bash scripts/test-data-check.sh
 
+# Every public declaration of the main sources has a Scaladoc (scripts/scaladoc-check.py), after
+# the check's own tests prove that it refuses one without.
+scaladoc:
+	@bash scripts/test-scaladoc-check.sh
+	@python3 -I -B scripts/scaladoc-check.py shared/src jvm/src js/src
+
 # Checks and never rewrites: run make fix and make fmt first, so unformatted code fails here
 # and in the release run instead of passing reformatted.
-validate: repo-guard release-test data-check-test lint compile test mima budget
+validate: repo-guard release-test data-check-test scaladoc lint compile test mima budget
 
 # The JVM tests on Java 17, the oldest Java the library supports (scalac already compiles against
 # its API). Mill runs on its own JVM, so TAIHEI_TEST_JAVA_HOME, a JDK 17's home, makes the test
