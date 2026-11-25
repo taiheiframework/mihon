@@ -7,12 +7,13 @@ line, relying on the layout scalafmt keeps: a declaration's body is indented bel
 declaration (def, val, var, class, object, trait, enum, type, given, an enum case) is checked when
 it is a member of a type or a top-level definition, not a local one inside a method or a value,
 and public: neither it nor anything around it is private or protected. Its Scaladoc, a /** */
-comment, ends on the line right above it; annotations may stand between. An override of equals,
-hashCode or toString inherits the contract of Any and needs none. Constructor parameters are
-documented with @param and are not checked.
+comment, ends on the line right above it; annotations may stand between, or before the
+declaration on its own line. An override of equals, hashCode or toString inherits the contract of
+Any and needs none. A constructor parameter is documented with @param; one declared `val` on a
+line of its own reads as a member and is refused without a Scaladoc, which errs on the safe side.
 
-Prints one "<file>:<line>: ..." per missing Scaladoc and exits 1 when there is one, or when no
-Scala file is found (a check over nothing proves nothing).
+Prints one "<file>:<line>: ..." per missing Scaladoc and exits 1 when there is one, when a path
+does not exist, or when no Scala file is found (a check over nothing proves nothing).
 """
 
 import os
@@ -27,6 +28,8 @@ HIDDEN = re.compile(r"^(private|protected)(\[\w+\])?$")
 TYPES = {"class", "object", "trait", "enum"}
 KEYWORDS = TYPES | {"def", "val", "var", "type", "given", "extension"}
 EXEMPT = {"equals", "hashCode", "toString"}
+# Leading annotations, with arguments that hold no parentheses of their own: "@targetName("plus") ".
+ANNOTATIONS = re.compile(r"^(@[\w.]+(\([^()]*\))?\s*)+")
 
 
 def declaration(text, in_enum):
@@ -85,7 +88,9 @@ def check(path):
             doc = False
             continue
         if text.startswith("@"):
-            continue
+            text = ANNOTATIONS.sub("", text)
+            if not text:
+                continue
         indent = len(raw) - len(raw.lstrip(" "))
         # The scopes this line would close. Only a declaration closes them: a continuation such
         # as "): Mihon =" stands at its definition's indent while the body below still belongs
@@ -128,6 +133,10 @@ def scala_files(arg):
 
 
 def main(args):
+    absent = [arg for arg in args if not os.path.exists(arg)]
+    if absent:
+        print(f"[scaladoc] no such file or folder: {' '.join(absent)}")
+        return 1
     files = [f for arg in args for f in scala_files(arg)]
     if not files:
         print(f"[scaladoc] no Scala file in {' '.join(args)}")

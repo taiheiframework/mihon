@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Proves that scripts/scaladoc-check.py accepts the sources as they are and refuses a public
-# declaration without a Scaladoc, naming its file and line: one taken out of a copy of Mihon.scala,
-# and each kind of declaration in small fixtures. Private, protected, local and exempt
-# declarations pass. Every case runs in a temporary folder; nothing in the repository changes.
+# Proves that scripts/scaladoc-check.py refuses a public declaration without a Scaladoc, naming its
+# file and line: one taken out of a copy of Mihon.scala, and each kind of declaration in small
+# fixtures. Private, protected, local and exempt declarations pass. Every case runs in a temporary
+# folder; nothing in the repository changes. make scaladoc then runs the check on the sources.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 T=$(mktemp -d "${TMPDIR:-/tmp}/mihon-scaladoc-check.XXXXXX")
@@ -23,11 +23,6 @@ refuses() { # name, expected message, paths...
 }
 fixture() { mkdir -p "$T/$1"; cat > "$T/$1/A.scala"; }
 
-accepts "the sources as they are" shared/src jvm/src js/src
-check shared/src jvm/src js/src || true
-grep -qE '^\[scaladoc\] [1-9][0-9]+ public declarations' "$T/out" \
-  || { echo "[FAIL] the sources have too few public declarations to prove anything:"; cat "$T/out"; FAILED=1; }
-
 # Mihon.bool without its one-line Scaladoc: the message names the file and the line of the def.
 mkdir "$T/mihon"
 grep -vF '/** True or false, each equally likely. */' shared/src/dev/taihei/mihon/Mihon.scala > "$T/mihon/Mihon.scala"
@@ -36,6 +31,55 @@ refuses "Mihon.bool without its Scaladoc" "$T/mihon/Mihon.scala:$LINE: public de
 
 mkdir "$T/empty"
 refuses "no Scala file" "no Scala file" "$T/empty"
+refuses "a path that does not exist" "no such file or folder: $T/missing" "$T/empty" "$T/missing"
+
+fixture annotated <<'EOF'
+package p
+
+/** Documented. */
+object O:
+
+  @targetName("plus") def ++(n: Int): Int = n
+
+  /** Documented. */
+  @deprecated("use another", "1.0") def old: Int = 1
+
+@experimental final class Extra:
+  def inside: Int = 1
+EOF
+refuses "an undocumented def behind an annotation" "A.scala:6: public def ++" "$T/annotated/A.scala"
+refuses "an undocumented class behind an annotation" "A.scala:11: public class Extra" "$T/annotated/A.scala"
+refuses "an undocumented member of an annotated class" "A.scala:12: public def inside" "$T/annotated/A.scala"
+check "$T/annotated/A.scala" || true
+if grep -qF 'public def old' "$T/out"; then echo "[FAIL] refuses a documented def behind an annotation"; FAILED=1
+else echo "[ok] accepts a documented def behind an annotation"; fi
+
+fixture kinds <<'EOF'
+package p
+
+/** Documented. */
+trait T:
+  def abstractMember: Int
+
+/** Documented. */
+object O:
+
+  /** Documented. */
+  var counter: Int = 0
+
+  var undocumented: Int = 0
+
+  extension (n: Int)
+    def twice: Int = n * 2
+
+  /** Documented. */
+  given ordering: Ordering[String] with
+    def compare(a: String, b: String): Int = a.compareTo(b)
+EOF
+refuses "an undocumented member of a trait" "A.scala:5: public def abstractMember" "$T/kinds/A.scala"
+refuses "an undocumented var" "A.scala:13: public var undocumented" "$T/kinds/A.scala"
+refuses "an undocumented extension method" "A.scala:16: public def twice" "$T/kinds/A.scala"
+refuses "an undocumented member of a given" "A.scala:20: public def compare" "$T/kinds/A.scala"
 
 fixture top <<'EOF'
 package p
